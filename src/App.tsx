@@ -1,11 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useQuery } from 'react-query';
 //components
+import { Item } from 'Item/Item';
+import Cart from 'Cart/Cart';
+//material-ui components
 import Drawer from '@material-ui/core/Drawer';
 import LinearProgress from '@material-ui/core/LinearProgress';
 import Grid from '@material-ui/core/Grid';
-import { Item } from 'Item/Item';
-// import AddShoppingCartIcon from '@material-ui/icons/AddShoppingCartIcon';
 import AddShoppingCartIcon from '@material-ui/icons/AddShoppingCart';
 import Badge from '@material-ui/core/Badge';
 //styles
@@ -31,14 +32,14 @@ const getProducts = async (): Promise<CartItemType[]> =>
 
 
 const App = () => {
+  const [cartOpen, setCartOpen] = useState(false);
+  const [cartItems, setCastItems] = useState([] as CartItemType[]);
   const { data, isLoading, error } = useQuery<CartItemType[]>(
     'products',
     getProducts
   );
 
-  console.log(data, 'data');
-
-  const getTotalItems = () => null;
+  const getTotalItems = (items: CartItemType[]) => items.reduce((acc: number, item) => acc + item.amount, 0);
   const handleAddToCart = (clickedItem: CartItemType) => null;
   const handleRemoveFromCart = () => null;
 
@@ -47,6 +48,17 @@ const App = () => {
 
   return (
     <div className={styles.wrapper}>
+
+      <Drawer anchor='right' open={cartOpen} onClose={() => setCartOpen(false)}>
+        <Cart cartItems={cartItems} addToCart={handleAddToCart} removeFromCart={handleRemoveFromCart} />
+      </Drawer>
+
+      <button className={styles.customButton} onClick={() => setCartOpen(true)}>
+        <Badge badgeContent={getTotalItems(cartItems)} color='error'>
+          <AddShoppingCartIcon />
+        </Badge>
+      </button>
+
       <Grid container spacing={3}>
         {data?.map(item => (
           <Grid item key={item.id} xs={12} sm={4}>
@@ -54,6 +66,7 @@ const App = () => {
           </Grid>
         ))}
       </Grid>
+
     </div>
   );
 };

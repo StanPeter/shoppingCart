@@ -1,3 +1,10 @@
 .wrapper {
-    
+    margin: 2rem;
+}
+
+.customButton {
+    position: fixed;
+    z-index: 100;
+    right: 1.5rem;
+    top: 1.5rem;
 }
