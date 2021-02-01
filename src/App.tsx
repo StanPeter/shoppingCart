@@ -33,15 +33,46 @@ const getProducts = async (): Promise<CartItemType[]> =>
 
 const App = () => {
   const [cartOpen, setCartOpen] = useState(false);
-  const [cartItems, setCastItems] = useState([] as CartItemType[]);
+  const [cartItems, setCartItems] = useState([] as CartItemType[]);
   const { data, isLoading, error } = useQuery<CartItemType[]>(
     'products',
     getProducts
   );
 
+  //get all items in the cart
   const getTotalItems = (items: CartItemType[]) => items.reduce((acc: number, item) => acc + item.amount, 0);
-  const handleAddToCart = (clickedItem: CartItemType) => null;
-  const handleRemoveFromCart = () => null;
+
+  //add items to cart
+  const handleAddToCart = (clickedItem: CartItemType) => {
+    setCartItems(prev => {
+      const isItemInCart = prev.find(item => item.id === clickedItem.id);
+
+      //is the item in the cart? -> increase its amount by 1, else add brandly new item
+      if (isItemInCart) {
+        return prev.map(item => (
+          item.id === clickedItem.id ? { ...item, amount: item.amount + 1 } : item
+        ));
+      }
+
+      return [...prev, { ...clickedItem, amount: 1 }];
+    })
+  };
+
+  //remove an item from the cart
+  const handleRemoveFromCart = (removedId: number) => {
+    setCartItems(prev => {
+      const isItemAmountGreater = prev.find(item => item.id === removedId && item.amount > 1);
+
+      //is the item's amount greater than 1? -> decrease its amount by 1, else remove it entirely
+      if (isItemAmountGreater) {
+        return prev.map(item => (
+          item.id === removedId ? { ...item, amount: item.amount - 1 } : item
+        ));
+      }
+
+      return prev.filter(item => item.id !== removedId);
+    })
+  };
 
   if (isLoading) return <LinearProgress />;
   if (error) return <div style={{ color: 'red' }}>There was an error</div>
