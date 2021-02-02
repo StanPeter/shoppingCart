@@ -1,6 +1,4 @@
 import React, { FC } from 'react';
-//material-ui components
-import Button from '@material-ui/core/Button';
 //components
 import CartItem from 'CartItem/CartItem';
 //types
